@@ -7,8 +7,8 @@ char * copiar_cadena(char *);
 %}
 
 digito [0-9]
-entero [+-]?{digito}+
-real [+-]?{digito}*\.{digito}+|[+-]?{digito}+\.{digito}*
+entero {digito}+
+real {digito}*\.{digito}+|{digito}+\.{digito}*
 operadores [-|+|\*|\/]
 nocs [^\"\n]+
 cadena \"({nocs}*)\"
