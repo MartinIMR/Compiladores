@@ -1,0 +1,11 @@
+Se introdujo la cadena:@abca_b@ab
+Se encontro el siguiente camino:
+1(E)-> 2(E)-> 4(E)-> 8(a)-> 9(E)-> 4(E)-> 6(b)-> 7(E)-> 8(a)-> 9(E)-> 4(E)-> 6(b)-> 7(E)-> 8(a)-> 9(E)-> 10(b)-> 16
+ERROR:SIMBOLO @ NO VALIDO
+ En estado:1. Cadena restante:abca_b@ab
+ERROR:SIMBOLO c NO VALIDO
+ En estado:7. Cadena restante:a_b@ab
+ERROR:SIMBOLO _ NO VALIDO
+ En estado:9. Cadena restante:b@ab
+ERROR:SIMBOLO @ NO VALIDO
+ En estado:7. Cadena restante:ab
