@@ -9,8 +9,8 @@ char * limpiar_cadena(char *);
 digito [0-9]
 entero {digito}+
 real {digito}*\.{digito}+|{digito}+\.{digito}*
-pow [pP][oO][wW]"("/ ( [{cadena}{entero}{real}] "," {entero} ")" ;)
-operadores [-|+|\*|\/|^|{pow}]
+pow [pP][oO][wW]
+operadores [-|+|\*|\/|^|(|)|,|;]
 nocs [^\"\n]+
 cadena \"({nocs}*)\"
 potencia [{cadena}{entero}{real}]"^"{entero}|[pP][oO][wW]\(
@@ -34,12 +34,13 @@ potencia [{cadena}{entero}{real}]"^"{entero}|[pP][oO][wW]\(
 		 return (CADENA);
 		}
 
+{pow}		{
+		 return POW;
+		}
+	
+
 {operadores}	{
 		 char op = yytext[0];
-		 if(op == 'p' || op == 'P')
-		 {
-		   op = '^';
-		 }
 		 switch(op)
 		 {
 		  case '+': printf("Suma\n"); break;
@@ -47,6 +48,10 @@ potencia [{cadena}{entero}{real}]"^"{entero}|[pP][oO][wW]\(
 		  case '*': printf("Multiplicacion\n"); break;
 		  case '/': printf("Division\n"); break;
 		  case '^': printf("Potencia\n"); break;
+		  case '(': printf("Parentesis derecho\n"); break;
+		  case ')': printf("Parentesis izquierdo\n"); break;
+		  case ';': printf("Punto y coma\n"); break;
+		  case ',': printf("Coma\n"); break;
 		 }
 		 return op;
                 }
@@ -54,6 +59,8 @@ potencia [{cadena}{entero}{real}]"^"{entero}|[pP][oO][wW]\(
 "\n" 		{ 
 		return '\n';
 		}
+
+
 
 %%
 

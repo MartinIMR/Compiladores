@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 extern int yylex(void);
 int yyerror(char *); 
 char * concatenar(char *, char *);
@@ -21,10 +22,11 @@ char * copiar_cadena(char *);
 %type <entero> expresion_entero
 %token <real> REAL
 %type <real> expresion_real
+%token POW
 
+%left '^'
 %left '+' '-'
 %left '*' '/'
-%left '^'
 
 %start entrada
 
@@ -72,6 +74,7 @@ linea: '\n'
 	}
 
 ;
+
 
 expresion_cadena: CADENA { $$ = $1;}
 	| expresion_cadena'+'expresion_cadena
@@ -129,6 +132,7 @@ expresion_real: REAL { $$ = $1; }
 	| expresion_entero '/' expresion_real{ $$ = $1 / $3; }
 	| '+'expresion_real { $$ = $2; }
 	| '-'expresion_real { $$ = (-$2); }
+	| POW'('expresion_entero','expresion_entero ')'';'{ $$ = pow($3,$5);  }
 ;
 
 expresion_entero: ENTERO { $$ = $1; }

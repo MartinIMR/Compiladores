@@ -47,7 +47,8 @@ extern int yydebug;
   {
     CADENA = 258,
     ENTERO = 259,
-    REAL = 260
+    REAL = 260,
+    POW = 261
   };
 #endif
 
@@ -56,13 +57,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 12 "pr.y" /* yacc.c:1909  */
+#line 13 "pr.y" /* yacc.c:1909  */
 
  int entero;
  double real;
  char * cadena;
 
-#line 66 "pr.tab.h" /* yacc.c:1909  */
+#line 67 "pr.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
