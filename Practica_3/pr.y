@@ -1,10 +1,14 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 extern int yylex(void);
 int yyerror(char *); 
 char * concatenar(char *, char *);
 int numero_caracteres(char *);
+char * reservar_cadena(int);
+char * copiar_cadena(char *);
+char * potencia_cadena(char *,int );
 %}
 
 %union {
@@ -19,9 +23,14 @@ int numero_caracteres(char *);
 %type <entero> expresion_entero
 %token <real> REAL
 %type <real> expresion_real
+%token POW
+%token SI
 
+%left '<' '>'
 %left '+' '-'
 %left '*' '/'
+%left '^'
+%left '(' ')'
 
 %start entrada
 
@@ -70,6 +79,7 @@ linea: '\n'
 
 ;
 
+
 expresion_cadena: CADENA { $$ = $1;}
 	| expresion_cadena'+'expresion_cadena
 	 { 
@@ -79,8 +89,86 @@ expresion_cadena: CADENA { $$ = $1;}
 	   free(s1);
            free(s2);
 	 }
+	| expresion_cadena '^' expresion_entero 
+	{ 
+          $$ = potencia_cadena($1,$3); 
+	}
 	| '+'expresion_cadena {$$ = $2;}
 	| '-''-' expresion_cadena{ $$ = $3;}
+	| '(' expresion_cadena ')' { $$ = $2; }
+	| SI'('expresion_entero'<'expresion_real')'';' {
+	 char * resultado;
+	 if($3 < $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+	}
+	| SI'('expresion_real'<'expresion_entero')'';' { 
+	 char * resultado;
+	 if($3 < $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+
+	} 
+	| SI'('expresion_real'<'expresion_real')'';' {
+	char * resultado;
+	 if($3 < $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+	}
+	| SI'('expresion_entero'<'expresion_entero')'';' {
+	 char * resultado;
+	 if($3 < $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+	}
+	| SI'('expresion_entero'>'expresion_real')'';' {
+	 char * resultado;
+	 if($3 > $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+	}
+	| SI'('expresion_real'>'expresion_entero')'';' {
+	 char * resultado;
+	 if($3 > $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+	}
+	| SI'('expresion_real'>'expresion_real')'';' {
+	 char * resultado;
+	 if($3 > $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+	}
+	| SI'('expresion_entero'>'expresion_entero')'';' {
+	 char * resultado;
+	 if($3 > $5){ 
+	  resultado = copiar_cadena("true");
+	 }else{
+	  resultado = copiar_cadena("false");
+	 } 
+	 $$ = resultado;
+	}
 ;
 
 expresion_real: REAL { $$ = $1; }
@@ -97,16 +185,26 @@ expresion_real: REAL { $$ = $1; }
 	| expresion_entero '/' expresion_entero{ $$ = (double)$1 / $3; }
 	| expresion_real '/' expresion_entero{ $$ = $1 / $3; }
 	| expresion_entero '/' expresion_real{ $$ = $1 / $3; }
+	| expresion_entero '^' expresion_real{ $$ = pow($1,$3); }
+	| expresion_real '^' expresion_entero{ $$ = pow($1,$3); }
+	| expresion_real '^' expresion_real{ $$ = pow($1,$3); }
 	| '+'expresion_real { $$ = $2; }
 	| '-'expresion_real { $$ = (-$2); }
+	| POW'('expresion_entero','expresion_real ')'';'{ $$ = pow($3,$5);  }
+	| POW'('expresion_real','expresion_real ')'';'{ $$ = pow($3,$5);  }
+	| POW'('expresion_real','expresion_entero ')'';'{ $$ = pow($3,$5);  }
+	| '(' expresion_real')' { $$ = $2; }
 ;
 
 expresion_entero: ENTERO { $$ = $1; }
 	| expresion_entero '+' expresion_entero { $$ = $1 + $3; }
 	| expresion_entero '-' expresion_entero { $$ = $1 - $3; }
 	| expresion_entero '*' expresion_entero { $$ = $1 * $3; }
+	| expresion_entero '^' expresion_entero{ $$ = (int) pow($1,$3); }
+	| POW'('expresion_entero','expresion_entero ')'';'{ $$ = (int) pow($3,$5);  }
 	| '+' expresion_entero { $$ = $2; }
 	| '-' expresion_entero { $$ = (-$2); }
+	| '(' expresion_entero ')' { $$ = $2; }
 ;
 
 %% 
@@ -115,6 +213,32 @@ int
 main(void)
 {
   yyparse();
+}
+
+char * 
+potencia_cadena(char * cadena, int numero)
+{
+  char * concatenada = NULL;
+  if(numero <= 0)
+  {
+	concatenada = "";
+  }
+  if(numero == 1)
+  {
+    	concatenada = cadena;
+  }else
+  {
+
+   concatenada = concatenar(cadena,cadena);
+   for(int  i = 0; i < numero-2 ; i++ )
+   {
+    char * aux = concatenada;
+    concatenada = concatenar(aux,cadena);
+    free(aux);
+   }
+
+  }
+  return concatenada;
 }
 
 char *
@@ -135,6 +259,30 @@ concatenar(char * s1,char * s2)
  i = 0;
  while(s2[i] != '\0') {cadena[j+i] = s2[i]; i++; };
  return cadena;
+}
+
+char *
+copiar_cadena(char * cadena)
+{
+ int longitud = numero_caracteres(cadena);
+ char * copia = reservar_cadena(longitud);
+ int i = 0;
+ while(cadena[i] != '\0') { copia[i] = cadena[i]; i++; };
+ return copia;
+}
+
+char *
+reservar_cadena(int longitud)
+{
+ char * reservada;
+ reservada = (char *) malloc( sizeof(char) * (longitud+1) );
+ if(reservada == NULL)
+ {
+   printf("No se pudo reservar espacio para la cadena\n");
+   return NULL;
+ }
+ reservada[longitud] = '\0';
+ return reservada;
 }
 
 int
