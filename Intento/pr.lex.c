@@ -671,7 +671,7 @@ YY_DECL
 		}
 
 	{
-#line 19 "pr.l"
+#line 18 "pr.l"
 
 
 #line 678 "pr.lex.c"
@@ -733,7 +733,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 21 "pr.l"
+#line 20 "pr.l"
 {
 		  yylval.entero = atoi(yytext);
 		  /* yylval.entero = (int) strtol(yytext,(char **)NULL,10); */
@@ -742,7 +742,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 27 "pr.l"
+#line 26 "pr.l"
 {
 		 yylval.real = strtod(yytext,NULL);
 		 return REAL;
@@ -750,7 +750,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 32 "pr.l"
+#line 31 "pr.l"
 {
 		 yylval.cadena = limpiar_cadena(yytext);
 		 return (CADENA);
@@ -758,14 +758,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 37 "pr.l"
+#line 36 "pr.l"
 {
 		 return POW;
 		}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 42 "pr.l"
+#line 41 "pr.l"
 {
 		 char op = yytext[0];
 		 switch(op)
@@ -786,14 +786,14 @@ YY_RULE_SETUP
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 59 "pr.l"
+#line 58 "pr.l"
 { 
 		return '\n';
 		}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 65 "pr.l"
+#line 64 "pr.l"
 ECHO;
 	YY_BREAK
 #line 800 "pr.lex.c"
@@ -1801,7 +1801,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 65 "pr.l"
+#line 64 "pr.l"
 
 
 char *

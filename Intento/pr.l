@@ -13,7 +13,6 @@ pow [pP][oO][wW]
 operadores [-|+|\*|\/|^|(|)|,|;]
 nocs [^\"\n]+
 cadena \"({nocs}*)\"
-potencia [{cadena}{entero}{real}]"^"{entero}|[pP][oO][wW]\(
 
 
 %%

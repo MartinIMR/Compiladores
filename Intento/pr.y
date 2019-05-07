@@ -130,15 +130,22 @@ expresion_real: REAL { $$ = $1; }
 	| expresion_entero '/' expresion_entero{ $$ = (double)$1 / $3; }
 	| expresion_real '/' expresion_entero{ $$ = $1 / $3; }
 	| expresion_entero '/' expresion_real{ $$ = $1 / $3; }
+	| expresion_entero '^' expresion_real{ $$ = pow($1,$3); }
+	| expresion_real '^' expresion_entero{ $$ = pow($1,$3); }
+	| expresion_real '^' expresion_real{ $$ = pow($1,$3); }
 	| '+'expresion_real { $$ = $2; }
 	| '-'expresion_real { $$ = (-$2); }
 	| POW'('expresion_entero','expresion_entero ')'';'{ $$ = pow($3,$5);  }
+	| POW'('expresion_entero','expresion_real ')'';'{ $$ = pow($3,$5);  }
+	| POW'('expresion_real','expresion_real ')'';'{ $$ = pow($3,$5);  }
+	| POW'('expresion_real','expresion_entero ')'';'{ $$ = pow($3,$5);  }
 ;
 
 expresion_entero: ENTERO { $$ = $1; }
 	| expresion_entero '+' expresion_entero { $$ = $1 + $3; }
 	| expresion_entero '-' expresion_entero { $$ = $1 - $3; }
 	| expresion_entero '*' expresion_entero { $$ = $1 * $3; }
+	| expresion_entero '^' expresion_entero{ $$ = (int) pow($1,$3); }
 	| '+' expresion_entero { $$ = $2; }
 	| '-' expresion_entero { $$ = (-$2); }
 ;
