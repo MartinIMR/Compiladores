@@ -26,6 +26,29 @@ public class AF
     errores = "";
   }
 
+  public void setInicial(String S)
+  {
+	this.S = S;
+  }
+
+  public AF convertirAFD()
+  {
+	AF determinista = new AF();
+	Hashtable<Integer,Set<String>> nuevosEstados = new Hashtable<Integer,Set<String>>();
+	Set<String> z = cerraduraEpsilon(this.S);
+
+  }
+
+  public Set<String> cerraduraEpsilon(String estado)
+  {
+	delta.get();
+	for()
+	{
+
+	}		
+
+  }
+
   @Override
   public String toString()
   {

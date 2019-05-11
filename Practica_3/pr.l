@@ -3,15 +3,18 @@
 #include <stdlib.h>
 #include "pr.tab.h"
 
-char * copiar_cadena(char *);
+char * limpiar_cadena(char *);
 %}
 
 digito [0-9]
 entero {digito}+
 real {digito}*\.{digito}+|{digito}+\.{digito}*
-operadores [-|+|\*|\/]
+pow [pP][oO][wW]
+si [iI][fF]
+operadores [-|+|\*|\/|^|(|)|,|;|<|>]
 nocs [^\"\n]+
 cadena \"({nocs}*)\"
+
 
 %%
 
@@ -27,19 +30,34 @@ cadena \"({nocs}*)\"
 		}
 
 {cadena}	{
-		 yylval.cadena = copiar_cadena(yytext);
+		 yylval.cadena = limpiar_cadena(yytext);
 		 return (CADENA);
+		}
+
+{pow}		{
+		 return POW;
+		}
+	
+{si}		{
+		 return SI;
 		}
 
 {operadores}	{
 		 char op = yytext[0];
+	         /*
 		 switch(op)
 		 {
 		  case '+': printf("Suma\n"); break;
 		  case '-': printf("Resta\n"); break;
 		  case '*': printf("Multiplicacion\n"); break;
 		  case '/': printf("Division\n"); break;
+		  case '^': printf("Potencia\n"); break;
+		  case '(': printf("Parentesis derecho\n"); break;
+		  case ')': printf("Parentesis izquierdo\n"); break;
+		  case ';': printf("Punto y coma\n"); break;
+		  case ',': printf("Coma\n"); break;
 		 }
+		 */
 		 return op;
                 }
 
@@ -47,10 +65,12 @@ cadena \"({nocs}*)\"
 		return '\n';
 		}
 
+
+
 %%
 
 char *
-copiar_cadena(char * original)
+limpiar_cadena(char * original)
 {
   int i = 0;
   while(original[i+1] != '"') { i++; };
