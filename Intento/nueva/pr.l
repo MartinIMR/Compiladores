@@ -34,10 +34,6 @@ potencia [{cadena}{entero}{real}]"^"{entero}|[pP][oO][wW]\(
 		 return (CADENA);
 		}
 
-{condicion}	{
-		 printf("Lo reconocido es:%s\n",yytext);
-		}
-
 {operadores}	{
 		 char op = yytext[0];
 		 if(op == 'p' || op == 'P')

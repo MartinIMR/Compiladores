@@ -22,9 +22,9 @@ char * copiar_cadena(char *);
 %token <real> REAL
 %type <real> expresion_real
 
-%left '+' '-'
-%left '*' '/'
 %left '^'
+%left '+' '-' 
+%left '*' '/'
 %left '(' ')'
 
 %start entrada
@@ -39,39 +39,6 @@ linea: '\n'
 	| expresion_cadena '\n' { printf("La cadena es:%s\n",$1); free($1); }
 	| expresion_real '\n' { printf("El resultado(real) es:%f\n",$1); }
 	| expresion_entero '\n' { printf("El resultado(entero) es:%d\n",$1); }
-	| expresion_cadena '+' expresion_real
-	{ 
-	printf("La cadena es:%s\nEl resultado(real) es:%f\n",$1,$3); 
-	}
-	| expresion_real '+' expresion_cadena 
-	{
-	printf("La cadena es:%s\nEl resultado(real) es:%f\n",$3,$1); 
-	}
-	| expresion_cadena '-' expresion_real
-	{ 
-	printf("La cadena es:%s\nEl resultado(real) es:%f\n",$1,(-$3)); 
-	}
-	| expresion_real '-' expresion_cadena 
-	{
-	printf("La cadena es:%s\nEl resultado(real) es:%f\n",$3,(-$1)); 
-	}
-	| expresion_cadena '+' expresion_entero '\n'
-	{
-	printf("La cadena es:%s\nEl resultado(entero) es:%d\n",$1,$3); 
-	}
-	| expresion_entero '+' expresion_cadena '\n'
-	{
-	printf("La cadena es:%s\nEl resultado(entero) es:%d\n",$3,$1); 
-	}
-	| expresion_cadena '-' expresion_entero '\n'
-	{
-	printf("La cadena es:%s\nEl resultado(entero) es:%d\n",$1,(-$3)); 
-	}
-	| expresion_entero '-' expresion_cadena '\n'
-	{
-	printf("La cadena es:%s\nEl resultado(entero) es:%d\n",$3,(-$1)); 
-	}
-
 ;
 
 expresion_cadena: CADENA { $$ = $1;}
@@ -136,8 +103,6 @@ expresion_entero: ENTERO { $$ = $1; }
 	| expresion_entero '+' expresion_entero { $$ = $1 + $3; }
 	| expresion_entero '-' expresion_entero { $$ = $1 - $3; }
 	| expresion_entero '*' expresion_entero { $$ = $1 * $3; }
-	| '+' expresion_entero { $$ = $2; }
-	| '-' expresion_entero { $$ = (-$2); }
 ;
 
 %% 
