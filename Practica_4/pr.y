@@ -1,5 +1,6 @@
 %{
 #include "def.h"
+#include "cadenas.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -44,7 +45,7 @@ entrada: /* Vacio */
 
 linea: '\n'
 	| expresion_cadena '\n' { printf("La cadena es:%s\n",$1); free($1); }
-	| expresion_variable '\n' { printf("OK"); }
+	| expresion_variable '\n' { printf("OK\n"); }
 	| expresion_real '\n' { printf("El resultado(real) es:%f\n",$1); }
 	| expresion_entero '\n' { printf("El resultado(entero) es:%d\n",$1); }
 	| expresion_cadena '+' expresion_real
@@ -82,14 +83,69 @@ linea: '\n'
 
 ;
 
-expresion_variable:
-	ID VAR ';' { 
+expresion_variable: VAR ';' 
+	{
+	  struct simbolo * encontrado = buscar_simbolo($1);
+	  if(encontrado == NULL)
+	  {
+	    printf("Esa varible no esta declarada...\n");
+	  }else{
+	    imprimir_simbolo(encontrado);    
+	  }
+	  $$ = encontrado;
+	}
+	| ID VAR ';' { 
 	 struct simbolo * anterior = tabla;
-	 printf("Tipo recibido:%d\nNombre:%s\n",$1,$2);
 	 tabla = agregar_simbolo($2,$1);
 	 tabla->siguiente = anterior;
 	 $$ = tabla;
 	}
+	| ID VAR '=' expresion_cadena ';' { 
+	 struct simbolo * anterior = tabla;
+	 tabla = agregar_simbolo($2,$1);
+	 tabla -> siguiente = anterior;
+	 if(tabla->tipo != 2)
+	 {
+	   printf("Asignacion no compatible, variable no declarada...\n");
+	   free(tabla);
+	   tabla = anterior;
+	 }else
+	 {
+	   tabla->valor.v_cadena = $4;
+	 }
+	 $$ = tabla;
+	}
+	| ID VAR '=' expresion_entero ';' { 
+	 struct simbolo * anterior = tabla;
+	 tabla = agregar_simbolo($2,$1);
+	 tabla -> siguiente = anterior;
+	 if(tabla->tipo != 0)
+	 {
+	   printf("Asignacion no compatible, variable no declarada...\n");
+	   free(tabla);
+	   tabla = anterior;
+	 }else
+	 {
+	   tabla->valor.v_entero = $4;
+	 }
+	 $$ = tabla;
+	}
+	| ID VAR '=' expresion_real ';' { 
+	 struct simbolo * anterior = tabla;
+	 tabla = agregar_simbolo($2,$1);
+	 tabla -> siguiente = anterior;
+	 if(tabla->tipo != 1)
+	 {
+	   printf("Asignacion no compatible, variable no declarada...\n");
+	   free(tabla);
+	   tabla = anterior;
+	 }else
+	 {
+	   tabla->valor.v_real = $4;
+	 }
+	 $$ = tabla;
+	}
+
 ;
 
 

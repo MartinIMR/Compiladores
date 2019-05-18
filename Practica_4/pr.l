@@ -2,10 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pr.tab.h"
+#include "cadenas.h"
 
 char * limpiar_cadena(char *);
-int comparar_cadenas(char *,char *);
-int longitud_cadena(char *);
 char * copiar_bufer(char *);
 %}
 
@@ -15,8 +14,8 @@ real {digito}*\.{digito}+|{digito}+\.{digito}*
 pow [pP][oO][wW]
 si [iI][fF]
 identificador [Ss]tring|ent|doble
-variable [_|A-Z|a-z]([_|a-z|A-Z|0-9])+
-operadores [-|+|\*|\/|^|(|)|,|;|<|>]
+variable [_|A-Z|a-z]([_|a-z|A-Z|0-9])*
+operadores [-|+|\*|\/|^|(|)|,|;|<|>|=]
 nocs [^\"\n]+
 cadena \"({nocs}*)\"
 
@@ -120,35 +119,6 @@ copiar_bufer(char * bufer)
   i++; 
   }
   return copia;
-}
-
-int
-comparar_cadenas(char * s1,char * s2)
-{
-  int l1 = longitud_cadena(s1);
-  int l2 = longitud_cadena(s2);
-  if(l1 != l2)
-  {
-    return 0;
-  }
-  int i = 0;
-  while(s1[i] != '\0' && s2[i] != '\0') { 
-	if(s1[i] != s2[i])
-	{
-	  return 0;
-	}
-	i++;
-  }
-  return 1;
-}
-
-int 
-longitud_cadena(char * cadena)
-{
- int i = 0;
-  while(cadena[i])
-   i++;
- return i;
 }
 
 char *

@@ -372,8 +372,8 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[37] =
     {   0,
-        0,    0,   11,   10,    9,   10,    8,   10,    1,   10,
-       10,   10,   10,   10,   10,    8,    0,    3,    2,    2,
+        0,    0,   11,   10,    9,   10,    8,   10,    1,    7,
+        7,    7,    7,    7,    7,    7,    0,    3,    2,    2,
         1,    7,    6,    7,    7,    7,    7,    2,    5,    7,
         7,    4,    7,    7,    7,    0
     } ;
@@ -386,7 +386,7 @@ static yyconst YY_CHAR yy_ec[256] =
         1,    1,    1,    3,    1,    1,    1,    1,    1,    4,
         4,    4,    4,    4,    4,    5,    4,    6,    6,    6,
         6,    6,    6,    6,    6,    6,    6,    1,    4,    4,
-        1,    4,    1,    1,    7,    7,    7,    7,    7,    8,
+        4,    4,    1,    1,    7,    7,    7,    7,    7,    8,
         7,    7,    9,    7,    7,    7,    7,    7,   10,   11,
         7,    7,   12,    7,    7,    7,   13,    7,    7,    7,
         1,    1,    1,    4,    7,    1,    7,   14,    7,   15,
@@ -476,12 +476,11 @@ char *yytext;
 #include <stdio.h>
 #include <stdlib.h>
 #include "pr.tab.h"
+#include "cadenas.h"
 
 char * limpiar_cadena(char *);
-int comparar_cadenas(char *,char *);
-int longitud_cadena(char *);
 char * copiar_bufer(char *);
-#line 485 "pr.lex.c"
+#line 484 "pr.lex.c"
 
 #define INITIAL 0
 
@@ -699,10 +698,10 @@ YY_DECL
 		}
 
 	{
-#line 24 "pr.l"
+#line 23 "pr.l"
 
 
-#line 706 "pr.lex.c"
+#line 705 "pr.lex.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -761,7 +760,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 26 "pr.l"
+#line 25 "pr.l"
 {
 		  yylval.entero = atoi(yytext);
 		  /* yylval.entero = (int) strtol(yytext,(char **)NULL,10); */
@@ -770,7 +769,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 32 "pr.l"
+#line 31 "pr.l"
 {
 		 yylval.real = strtod(yytext,NULL);
 		 return REAL;
@@ -778,7 +777,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 37 "pr.l"
+#line 36 "pr.l"
 {
 		 yylval.cadena = limpiar_cadena(yytext);
 		 return (CADENA);
@@ -786,7 +785,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "pr.l"
+#line 41 "pr.l"
 {
 		  int tipo = 0;
 	          char * iden = copiar_bufer(yytext);
@@ -808,21 +807,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 61 "pr.l"
+#line 60 "pr.l"
 {
 		 return POW;
 		}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 65 "pr.l"
+#line 64 "pr.l"
 {
 		 return SI;
 		}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 70 "pr.l"
+#line 69 "pr.l"
 {
 		  char * nombre = copiar_bufer(yytext);
 		  yylval.cadena = nombre;
@@ -831,7 +830,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 78 "pr.l"
+#line 77 "pr.l"
 {
 		 char op = yytext[0];
 	         /*
@@ -854,17 +853,17 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 97 "pr.l"
+#line 96 "pr.l"
 { 
 		return '\n';
 		}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 103 "pr.l"
+#line 102 "pr.l"
 ECHO;
 	YY_BREAK
-#line 868 "pr.lex.c"
+#line 867 "pr.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1865,7 +1864,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 103 "pr.l"
+#line 102 "pr.l"
 
 
 
@@ -1887,35 +1886,6 @@ copiar_bufer(char * bufer)
   i++; 
   }
   return copia;
-}
-
-int
-comparar_cadenas(char * s1,char * s2)
-{
-  int l1 = longitud_cadena(s1);
-  int l2 = longitud_cadena(s2);
-  if(l1 != l2)
-  {
-    return 0;
-  }
-  int i = 0;
-  while(s1[i] != '\0' && s2[i] != '\0') { 
-	if(s1[i] != s2[i])
-	{
-	  return 0;
-	}
-	i++;
-  }
-  return 1;
-}
-
-int 
-longitud_cadena(char * cadena)
-{
- int i = 0;
-  while(cadena[i])
-   i++;
- return i;
 }
 
 char *
