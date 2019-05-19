@@ -24,6 +24,7 @@ struct simbolo * tabla = NULL;
 %token <real> REAL
 %type <real> expresion_real
 %type <sptr> expresion_variable
+%type <sptr> operacion_variable
 %token <cadena> VAR
 %token <entero> ID
 %token POW
@@ -83,6 +84,45 @@ linea: '\n'
 
 ;
 
+operacion_variable: VAR '+' VAR {
+	  struct simbolo * resultado;
+	  struct simbolo * op1 = buscar_simbolo($1);
+	  struct simbolo * op2 = buscar_simbolo($3);
+	  if( op1 == NULL || op2 == NULL)
+	  {
+	     printf("Una de las variables no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+	  int t1 = op1->tipo, t2 = op2->tipo;
+	    if( t1 == t2 )
+	    {
+	       switch(t1)
+	       {
+		 case 0:
+		 resultado = agregar_simbolo("Resultado",0);
+		 resultado->valor.v_entero = op1->valor.v_entero + op2->valor.v_entero;
+		 break;
+		 case 1:
+		 resultado = agregar_simbolo("Resultado",1);
+		 resultado->valor.v_real = op1->valor.v_real + op2->valor.v_real;
+		 break;
+		 case 2:
+		 resultado = agregar_simbolo("Resultado",2);
+		 resultado->valor.v_cadena = concatenar(op1->valor.v_cadena,op2->valor.v_cadena);
+		 break;
+	       }
+	       resultado->siguiente = NULL;
+	    }else
+	    {
+		printf("En construccion...\n");
+		resultado == NULL;
+	    }
+	  }
+	 $$ = resultado;
+	}
+;
+
 expresion_variable: VAR ';' 
 	{
 	  struct simbolo * encontrado = buscar_simbolo($1);
@@ -91,6 +131,63 @@ expresion_variable: VAR ';'
 	    printf("Esa varible no esta declarada...\n");
 	  }else{
 	    imprimir_simbolo(encontrado);    
+	  }
+	  $$ = encontrado;
+	}
+	| VAR '=' expresion_cadena ';'{
+	  struct simbolo * encontrado = buscar_simbolo($1);
+	  if(encontrado == NULL)
+	  {
+	    printf("Esa variable no esta declarada...\n");
+	  }else
+	  {
+	    if(encontrado->tipo != 2)
+	    {
+	      printf("La asignacion no se puede realizar...\n");
+
+	    }else
+	    {
+		if(encontrado->valor.v_cadena != NULL)
+		{
+		  free(encontrado->valor.v_cadena);
+		}
+		encontrado->valor.v_cadena = copiar_cadena($3);	
+            }
+	  }
+	  $$ = encontrado;
+	}
+ 	| VAR '=' expresion_entero ';'{
+	  struct simbolo * encontrado = buscar_simbolo($1);
+	  if(encontrado == NULL)
+	  {
+	    printf("Esa variable no esta declarada...\n");
+	  }else
+	  {
+	    if(encontrado->tipo != 0)
+	    {
+	      printf("La asignacion no se puede realizar...\n");
+
+	    }else
+	    {
+		encontrado->valor.v_entero = $3;
+            }
+	  }
+	  $$ = encontrado;
+	}
+ 	| VAR '=' expresion_real ';'{
+	  struct simbolo * encontrado = buscar_simbolo($1);
+	  if(encontrado == NULL)
+	  {
+	    printf("Esa variable no esta declarada...\n");
+	  }else
+	  {
+	    if(encontrado->tipo != 1)
+	    {
+	      printf("La asignacion no se puede realizar...\n");
+	    }else
+	    {
+		encontrado->valor.v_real = $3;
+            }
 	  }
 	  $$ = encontrado;
 	}
@@ -145,7 +242,41 @@ expresion_variable: VAR ';'
 	 }
 	 $$ = tabla;
 	}
-
+	| VAR '=' operacion_variable ';' {
+	  struct simbolo * encontrado = buscar_simbolo($1);
+	  if(encontrado == NULL)
+	  {
+	    printf("Esa variable no esta declarada...\n");
+	  }else
+	  {
+	    struct simbolo * resultado = $3;
+	    if(encontrado->tipo != resultado->tipo )
+	    {
+	      printf("La asignacion no se puede realizar...\n");
+	    }else
+	    {
+		switch(encontrado->tipo)
+		{
+		  case 0:
+		  encontrado->valor.v_entero = resultado->valor.v_entero;
+		  break;
+		  case 1:
+		  encontrado->valor.v_real = resultado->valor.v_real;
+		  break;
+		  case 2:
+		  encontrado->valor.v_cadena = copiar_cadena(resultado->valor.v_cadena);
+		  free(resultado->valor.v_cadena);
+		  break;
+		}
+		free(resultado);
+            }
+	  }
+	  $$ = encontrado;
+	}
+	| operacion_variable ';'{
+	  imprimir_simbolo($1);
+	  free($1);
+	}
 ;
 
 
