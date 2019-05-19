@@ -13,7 +13,7 @@ entero {digito}+
 real {digito}*\.{digito}+|{digito}+\.{digito}*
 pow [pP][oO][wW]
 si [iI][fF]
-identificador [Ss]tring|ent|doble
+identificador [Ss]tring|int|double
 variable [_|A-Z|a-z]([_|a-z|A-Z|0-9])*
 operadores [-|+|\*|\/|^|(|)|,|;|<|>|=]
 nocs [^\"\n]+

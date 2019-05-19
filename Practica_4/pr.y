@@ -53,7 +53,7 @@ linea: '\n'
 	{ 
 	printf("La cadena es:%s\nEl resultado(real) es:%f\n",$1,$3); 
 	}
-	| expresion_real '+' expresion_cadena 
+	| expresion_real '+' expresion_cadena
 	{
 	printf("La cadena es:%s\nEl resultado(real) es:%f\n",$3,$1); 
 	}
@@ -121,6 +121,152 @@ operacion_variable: VAR '+' VAR {
 	  }
 	 $$ = resultado;
 	}
+	| VAR '-' VAR {
+	  struct simbolo * resultado;
+	  struct simbolo * op1 = buscar_simbolo($1);
+	  struct simbolo * op2 = buscar_simbolo($3);
+	  if( op1 == NULL || op2 == NULL)
+	  {
+	     printf("Una de las variables no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+	  int t1 = op1->tipo, t2 = op2->tipo;
+	    if( t1 == t2 )
+	    {
+	       switch(t1)
+	       {
+		 case 0:
+		 resultado = agregar_simbolo("Resultado",0);
+		 resultado->valor.v_entero = op1->valor.v_entero - op2->valor.v_entero;
+		 break;
+		 case 1:
+		 resultado = agregar_simbolo("Resultado",1);
+		 resultado->valor.v_real = op1->valor.v_real - op2->valor.v_real;
+		 break;
+		 case 2:
+		 resultado = agregar_simbolo("Resultado",2);
+		 printf("La operacion susbtracion no esta definida para cadenas.\nSe concatenaran.\n");
+		 resultado->valor.v_cadena = concatenar(op1->valor.v_cadena,op2->valor.v_cadena);
+		 break;
+	       }
+	       resultado->siguiente = NULL;
+	    }else
+	    {
+		printf("En construccion...\n");
+		resultado == NULL;
+	    }
+	  }
+	 $$ = resultado;
+	}
+	| VAR '*' VAR {
+	  struct simbolo * resultado;
+	  struct simbolo * op1 = buscar_simbolo($1);
+	  struct simbolo * op2 = buscar_simbolo($3);
+	  if( op1 == NULL || op2 == NULL)
+	  {
+	     printf("Una de las variables no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+	  int t1 = op1->tipo, t2 = op2->tipo;
+	    if( t1 == t2 )
+	    {
+	       switch(t1)
+	       {
+		 case 0:
+		 resultado = agregar_simbolo("Resultado",0);
+		 resultado->valor.v_entero = op1->valor.v_entero * op2->valor.v_entero;
+		 break;
+		 case 1:
+		 resultado = agregar_simbolo("Resultado",1);
+		 resultado->valor.v_real = op1->valor.v_real * op2->valor.v_real;
+		 break;
+		 case 2:
+		 resultado = agregar_simbolo("Resultado",2);
+		 printf("La operacion multiplicacion no esta definida para cadenas.\nSe concatenaran.\n");
+		 resultado->valor.v_cadena = concatenar(op1->valor.v_cadena,op2->valor.v_cadena);
+		 break;
+	       }
+	       resultado->siguiente = NULL;
+	    }else
+	    {
+		printf("En construccion...\n");
+		resultado == NULL;
+	    }
+	  }
+	 $$ = resultado;
+	}
+	| VAR '+' expresion_cadena {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($1);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+	    if( op->tipo != 2 )
+	    {
+		printf("Tipos no compatibles\n");
+		resultado = NULL;
+	    }else
+	    {
+		resultado = agregar_simbolo("Resultado",2);
+		resultado->valor.v_cadena = concatenar(op->valor.v_cadena,$3);
+		resultado->siguiente == NULL;
+	    }
+	  }
+	 $$ = resultado;
+
+	}
+	| VAR '+' expresion_real {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($1);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {
+	    if( op->tipo != 1 )
+	    {
+		printf("Tipos no compatibles\n");
+		resultado = NULL;
+	    }else
+	    {
+		resultado = agregar_simbolo("Resultado",1);
+		resultado->valor.v_real = op->valor.v_real + $3;
+		resultado->siguiente == NULL;
+	    }
+	  }
+	 $$ = resultado;
+
+	}
+	| VAR '+' expresion_entero {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($1);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {
+	    if( op->tipo != 0 )
+	    {
+		printf("Tipos no compatibles\n");
+		resultado = NULL;
+	    }else
+	    {
+		resultado = agregar_simbolo("Resultado",0);
+		resultado->valor.v_entero = op->valor.v_entero + $3;
+		resultado->siguiente == NULL;
+	    }
+	  }
+	 $$ = resultado;
+
+	}
+
 ;
 
 expresion_variable: VAR ';' 
@@ -128,11 +274,10 @@ expresion_variable: VAR ';'
 	  struct simbolo * encontrado = buscar_simbolo($1);
 	  if(encontrado == NULL)
 	  {
-	    printf("Esa varible no esta declarada...\n");
+	    printf("Esa variable no esta declarada...\n");
 	  }else{
 	    imprimir_simbolo(encontrado);    
 	  }
-	  $$ = encontrado;
 	}
 	| VAR '=' expresion_cadena ';'{
 	  struct simbolo * encontrado = buscar_simbolo($1);
@@ -147,14 +292,10 @@ expresion_variable: VAR ';'
 
 	    }else
 	    {
-		if(encontrado->valor.v_cadena != NULL)
-		{
-		  free(encontrado->valor.v_cadena);
-		}
-		encontrado->valor.v_cadena = copiar_cadena($3);	
+		free(encontrado->valor.v_cadena);
+		encontrado->valor.v_cadena = $3;
             }
 	  }
-	  $$ = encontrado;
 	}
  	| VAR '=' expresion_entero ';'{
 	  struct simbolo * encontrado = buscar_simbolo($1);
@@ -172,7 +313,6 @@ expresion_variable: VAR ';'
 		encontrado->valor.v_entero = $3;
             }
 	  }
-	  $$ = encontrado;
 	}
  	| VAR '=' expresion_real ';'{
 	  struct simbolo * encontrado = buscar_simbolo($1);
@@ -189,13 +329,12 @@ expresion_variable: VAR ';'
 		encontrado->valor.v_real = $3;
             }
 	  }
-	  $$ = encontrado;
+
 	}
 	| ID VAR ';' { 
 	 struct simbolo * anterior = tabla;
 	 tabla = agregar_simbolo($2,$1);
 	 tabla->siguiente = anterior;
-	 $$ = tabla;
 	}
 	| ID VAR '=' expresion_cadena ';' { 
 	 struct simbolo * anterior = tabla;
@@ -210,7 +349,7 @@ expresion_variable: VAR ';'
 	 {
 	   tabla->valor.v_cadena = $4;
 	 }
-	 $$ = tabla;
+
 	}
 	| ID VAR '=' expresion_entero ';' { 
 	 struct simbolo * anterior = tabla;
@@ -225,7 +364,6 @@ expresion_variable: VAR ';'
 	 {
 	   tabla->valor.v_entero = $4;
 	 }
-	 $$ = tabla;
 	}
 	| ID VAR '=' expresion_real ';' { 
 	 struct simbolo * anterior = tabla;
@@ -240,19 +378,19 @@ expresion_variable: VAR ';'
 	 {
 	   tabla->valor.v_real = $4;
 	 }
-	 $$ = tabla;
 	}
 	| VAR '=' operacion_variable ';' {
+
 	  struct simbolo * encontrado = buscar_simbolo($1);
 	  if(encontrado == NULL)
 	  {
-	    printf("Esa variable no esta declarada...\n");
+	    printf("Esa variable no esta declarada...\nAsignacion no realizada\n");
 	  }else
 	  {
 	    struct simbolo * resultado = $3;
 	    if(encontrado->tipo != resultado->tipo )
 	    {
-	      printf("La asignacion no se puede realizar...\n");
+	      printf("Tipos no concuerdan...\nAsignacion no realizada\n");
 	    }else
 	    {
 		switch(encontrado->tipo)
@@ -264,6 +402,7 @@ expresion_variable: VAR ';'
 		  encontrado->valor.v_real = resultado->valor.v_real;
 		  break;
 		  case 2:
+		  free(encontrado->valor.v_cadena);
 		  encontrado->valor.v_cadena = copiar_cadena(resultado->valor.v_cadena);
 		  free(resultado->valor.v_cadena);
 		  break;
@@ -271,11 +410,40 @@ expresion_variable: VAR ';'
 		free(resultado);
             }
 	  }
-	  $$ = encontrado;
 	}
 	| operacion_variable ';'{
 	  imprimir_simbolo($1);
 	  free($1);
+	}
+	| ID VAR '=' operacion_variable ';' {
+	 struct simbolo * anterior = tabla;
+	 tabla = agregar_simbolo($2,$1);
+	 tabla -> siguiente = anterior;
+	 struct simbolo * resultado = $4;
+	 if(tabla->tipo != resultado->tipo)
+	 {
+	   printf("Asignacion no compatible, variable no declarada...\n");
+	   free(tabla);
+	   free(resultado);
+	   tabla = anterior;
+	 }else
+	 {
+		switch(tabla->tipo)
+		{
+		  case 0:
+		  tabla->valor.v_entero = resultado->valor.v_entero;
+		  break;
+		  case 1:
+		  tabla->valor.v_real = resultado->valor.v_real;
+		  break;
+		  case 2:
+		  tabla->valor.v_cadena = copiar_cadena(resultado->valor.v_cadena);
+		  free(resultado->valor.v_cadena);
+		  break;
+		}
+		free(resultado);
+	 }
+
 	}
 ;
 
