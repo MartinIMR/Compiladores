@@ -45,10 +45,10 @@ cadena \"({nocs}*)\"
 		  {
 			tipo = 2;
 		  }
-		  if(comparar_cadenas("doble",iden)){
+		  if(comparar_cadenas("double",iden)){
 			tipo = 1;
 		  }
-		  if(comparar_cadenas("ent",iden))
+		  if(comparar_cadenas("int",iden))
 		  {
 			tipo = 0;
                   }

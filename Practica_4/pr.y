@@ -244,6 +244,8 @@ operacion_variable: VAR '+' VAR {
 
 	}
 	| VAR '+' expresion_entero {
+	  sumar_variables(var1,var2,tipo);
+	  sumar_variable(,0);
 	  struct simbolo * resultado;
 	  struct simbolo * op = buscar_simbolo($1);
 	  if( op == NULL)
@@ -260,6 +262,75 @@ operacion_variable: VAR '+' VAR {
 	    {
 		resultado = agregar_simbolo("Resultado",0);
 		resultado->valor.v_entero = op->valor.v_entero + $3;
+		resultado->siguiente == NULL;
+	    }
+	  }
+	 $$ = resultado;
+
+	}
+	| expresion_cadena '+' VAR {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($3);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+	    if( op->tipo != 2 )
+	    {
+		printf("Tipos no compatibles\n");
+		resultado = NULL;
+	    }else
+	    {
+		resultado = agregar_simbolo("Resultado",2);
+		resultado->valor.v_cadena = concatenar(op->valor.v_cadena,$1);
+		resultado->siguiente == NULL;
+	    }
+	  }
+	 $$ = resultado;
+
+	}
+	| expresion_real '+' VAR {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($3);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {
+	    if( op->tipo != 1 )
+	    {
+		printf("Tipos no compatibles\n");
+		resultado = NULL;
+	    }else
+	    {
+		resultado = agregar_simbolo("Resultado",1);
+		resultado->valor.v_real = op->valor.v_real + $1;
+		resultado->siguiente == NULL;
+	    }
+	  }
+	 $$ = resultado;
+
+	}
+	| expresion_entero '+' VAR {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($3);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {
+	    if( op->tipo != 0 )
+	    {
+		printf("Tipos no compatibles\n");
+		resultado = NULL;
+	    }else
+	    {
+		resultado = agregar_simbolo("Resultado",0);
+		resultado->valor.v_entero = op->valor.v_entero + $1;
 		resultado->siguiente == NULL;
 	    }
 	  }
@@ -588,3 +659,64 @@ yyerror(char *s)
 {
  printf("Error:----%s----\n",s);
 }
+
+
+struct simbolo *
+operar_variables(struct simbolo * v1,struct simbolo * v2,int operacion,int tipo_regreso)
+{
+  struct simbolo * resultado = agregar_simbolo("Resultado",tipo_regreso);
+  resultado->siguiente = NULL;
+  double td;
+  switch(operacion)
+  {
+    case suma:
+	if(v1->tipo == v2->tipo)
+	{
+	  switch(v1->tipo)
+	  {
+		case entero:
+		td = v1->valor.v_entero + v2->valor.v_entero;
+		break;
+		case real:
+		td = v1->valor.v_real + v2->valor.real;
+		break;
+		case cadena:
+		
+		break;
+	  }
+
+	}
+	if(v1->tipo == cadena || v2->tipo == cadena)
+	{
+	
+	}else
+	{
+
+	}
+    break;
+    case resta:
+	
+    break;
+    case multiplicacion:
+    break;
+    case division:
+    break;
+    case potencia:
+    break;
+  }
+
+  switch(tipo_regreso)
+  {
+    case entero:
+    resultado->valor.v_entero = (int) td;
+    break;
+    case double:
+    resultado->valor.v_real = (double) td;
+    break;
+    case cadena:
+    break;
+  }
+
+}
+
+

@@ -11,6 +11,9 @@ struct simbolo
   struct simbolo * siguiente;
 };
 
+enum tipos{ entero, real, cadena }; 
+enum operaciones{ suma = 3, resta, multiplicacion, division, potencia};
+
 void imprimir_simbolo(struct simbolo *);
 extern struct simbolo * tabla;
 struct simbolo * agregar_simbolo(char *,int);
