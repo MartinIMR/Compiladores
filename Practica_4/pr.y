@@ -7,6 +7,7 @@
 extern int yylex(void);
 int yyerror(char *); 
 struct simbolo * tabla = NULL;
+struct simbolo * operar_variables(struct simbolo *,struct simbolo *,int,int);
 
 %}
 
@@ -94,30 +95,7 @@ operacion_variable: VAR '+' VAR {
 	     resultado = NULL;
           }else
 	  {	
-	  int t1 = op1->tipo, t2 = op2->tipo;
-	    if( t1 == t2 )
-	    {
-	       switch(t1)
-	       {
-		 case 0:
-		 resultado = agregar_simbolo("Resultado",0);
-		 resultado->valor.v_entero = op1->valor.v_entero + op2->valor.v_entero;
-		 break;
-		 case 1:
-		 resultado = agregar_simbolo("Resultado",1);
-		 resultado->valor.v_real = op1->valor.v_real + op2->valor.v_real;
-		 break;
-		 case 2:
-		 resultado = agregar_simbolo("Resultado",2);
-		 resultado->valor.v_cadena = concatenar(op1->valor.v_cadena,op2->valor.v_cadena);
-		 break;
-	       }
-	       resultado->siguiente = NULL;
-	    }else
-	    {
-		printf("En construccion...\n");
-		resultado == NULL;
-	    }
+	    resultado = operar_variables(op1,op2,suma,entero); 
 	  }
 	 $$ = resultado;
 	}
@@ -244,8 +222,6 @@ operacion_variable: VAR '+' VAR {
 
 	}
 	| VAR '+' expresion_entero {
-	  sumar_variables(var1,var2,tipo);
-	  sumar_variable(,0);
 	  struct simbolo * resultado;
 	  struct simbolo * op = buscar_simbolo($1);
 	  if( op == NULL)
@@ -667,42 +643,64 @@ operar_variables(struct simbolo * v1,struct simbolo * v2,int operacion,int tipo_
   struct simbolo * resultado = agregar_simbolo("Resultado",tipo_regreso);
   resultado->siguiente = NULL;
   double td;
-  switch(operacion)
+  char * tc;
+  if(v1->tipo == v2->tipo)
   {
-    case suma:
-	if(v1->tipo == v2->tipo)
+    switch(v1->tipo)
+    {
+	case entero:
+	switch(operacion)
 	{
-	  switch(v1->tipo)
-	  {
-		case entero:
-		td = v1->valor.v_entero + v2->valor.v_entero;
-		break;
-		case real:
-		td = v1->valor.v_real + v2->valor.real;
-		break;
-		case cadena:
-		
-		break;
-	  }
-
+	  case suma:
+	  td = v1->valor.v_entero + v2->valor.v_entero;
+	  break;
+	  case resta:
+	  td = v1->valor.v_entero - v2->valor.v_entero;
+	  break;
+	  case multiplicacion:
+	  td = v1->valor.v_entero * v2->valor.v_entero;
+	  break;
+	  case division:
+	  td = (double)(v1->valor.v_entero)/(v2->valor.v_entero);
+	  break;
 	}
-	if(v1->tipo == cadena || v2->tipo == cadena)
+	break;
+	case real:
+	switch(operacion)
 	{
-	
-	}else
-	{
-
+	  case suma:
+	  td = v1->valor.v_real + v2->valor.v_real;
+	  break;
+	  case resta:
+	  td = v1->valor.v_real - v2->valor.v_real;
+	  break;
+	  case multiplicacion:
+	  td = v1->valor.v_real * v2->valor.v_real;
+	  break;
+	  case division:
+	  td = (v1->valor.v_real)/(v2->valor.v_real);
+	  break;
 	}
-    break;
-    case resta:
-	
-    break;
-    case multiplicacion:
-    break;
-    case division:
-    break;
-    case potencia:
-    break;
+
+	break;
+	case cadena:
+	switch(operacion)
+	{
+	  case suma:
+	  tc = concatenar(v1->valor.v_cadena,v2->valor.v_cadena);
+	  break;
+	  case resta:
+	  printf("Operacion resta de cadenas no esta definida...\n");
+	  break;
+	  case multiplicacion:
+	  printf("Operacion multiplicacion de cadenas no esta definida...\n");
+	  break;
+	  case division:
+	  printf("Operacion division de cadenas no esta definida...\n");
+	  break;
+	}
+      break;
+    }
   }
 
   switch(tipo_regreso)
@@ -710,12 +708,14 @@ operar_variables(struct simbolo * v1,struct simbolo * v2,int operacion,int tipo_
     case entero:
     resultado->valor.v_entero = (int) td;
     break;
-    case double:
+    case real:
     resultado->valor.v_real = (double) td;
     break;
     case cadena:
+    resultado->valor.v_cadena = tc;
     break;
   }
+  return resultado;
 
 }
 

@@ -60,7 +60,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 13 "pr.y" /* yacc.c:1909  */
+#line 14 "pr.y" /* yacc.c:1909  */
 
  int entero;
  double real;
