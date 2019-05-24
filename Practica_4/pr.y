@@ -95,12 +95,23 @@ operacion_variable: VAR '+' VAR {
 	     resultado = NULL;
           }else
 	  {	
-	    resultado = operar_variables(op1,op2,suma,entero); 
+	      switch(op1->tipo)
+		{
+		  case entero:
+		  resultado = operar_variables(op1,op2,suma,entero); 
+		  break;
+		  case real:
+		  resultado = operar_variables(op1,op2,suma,real); 
+		  break;
+		  case cadena:
+		  resultado = operar_variables(op1,op2,suma,cadena); 
+		  break;
+		}
 	  }
 	 $$ = resultado;
 	}
 	| VAR '-' VAR {
-	  struct simbolo * resultado;
+	 struct simbolo * resultado;
 	  struct simbolo * op1 = buscar_simbolo($1);
 	  struct simbolo * op2 = buscar_simbolo($3);
 	  if( op1 == NULL || op2 == NULL)
@@ -109,36 +120,23 @@ operacion_variable: VAR '+' VAR {
 	     resultado = NULL;
           }else
 	  {	
-	  int t1 = op1->tipo, t2 = op2->tipo;
-	    if( t1 == t2 )
-	    {
-	       switch(t1)
-	       {
-		 case 0:
-		 resultado = agregar_simbolo("Resultado",0);
-		 resultado->valor.v_entero = op1->valor.v_entero - op2->valor.v_entero;
-		 break;
-		 case 1:
-		 resultado = agregar_simbolo("Resultado",1);
-		 resultado->valor.v_real = op1->valor.v_real - op2->valor.v_real;
-		 break;
-		 case 2:
-		 resultado = agregar_simbolo("Resultado",2);
-		 printf("La operacion susbtracion no esta definida para cadenas.\nSe concatenaran.\n");
-		 resultado->valor.v_cadena = concatenar(op1->valor.v_cadena,op2->valor.v_cadena);
-		 break;
-	       }
-	       resultado->siguiente = NULL;
-	    }else
-	    {
-		printf("En construccion...\n");
-		resultado == NULL;
-	    }
+	      switch(op1->tipo)
+		{
+		  case entero:
+		  resultado = operar_variables(op1,op2,resta,entero); 
+		  break;
+		  case real:
+		  resultado = operar_variables(op1,op2,resta,real); 
+		  break;
+		  case cadena:
+		  resultado = operar_variables(op1,op2,resta,cadena); 
+		  break;
+		}
 	  }
 	 $$ = resultado;
 	}
 	| VAR '*' VAR {
-	  struct simbolo * resultado;
+	 struct simbolo * resultado;
 	  struct simbolo * op1 = buscar_simbolo($1);
 	  struct simbolo * op2 = buscar_simbolo($3);
 	  if( op1 == NULL || op2 == NULL)
@@ -147,31 +145,18 @@ operacion_variable: VAR '+' VAR {
 	     resultado = NULL;
           }else
 	  {	
-	  int t1 = op1->tipo, t2 = op2->tipo;
-	    if( t1 == t2 )
-	    {
-	       switch(t1)
-	       {
-		 case 0:
-		 resultado = agregar_simbolo("Resultado",0);
-		 resultado->valor.v_entero = op1->valor.v_entero * op2->valor.v_entero;
-		 break;
-		 case 1:
-		 resultado = agregar_simbolo("Resultado",1);
-		 resultado->valor.v_real = op1->valor.v_real * op2->valor.v_real;
-		 break;
-		 case 2:
-		 resultado = agregar_simbolo("Resultado",2);
-		 printf("La operacion multiplicacion no esta definida para cadenas.\nSe concatenaran.\n");
-		 resultado->valor.v_cadena = concatenar(op1->valor.v_cadena,op2->valor.v_cadena);
-		 break;
-	       }
-	       resultado->siguiente = NULL;
-	    }else
-	    {
-		printf("En construccion...\n");
-		resultado == NULL;
-	    }
+	      switch(op1->tipo)
+		{
+		  case entero:
+		  resultado = operar_variables(op1,op2,multiplicacion,entero); 
+		  break;
+		  case real:
+		  resultado = operar_variables(op1,op2,multiplicacion,real); 
+		  break;
+		  case cadena:
+		  resultado = operar_variables(op1,op2,multiplicacion,cadena); 
+		  break;
+		}
 	  }
 	 $$ = resultado;
 	}
@@ -194,6 +179,7 @@ operacion_variable: VAR '+' VAR {
 		resultado->valor.v_cadena = concatenar(op->valor.v_cadena,$3);
 		resultado->siguiente == NULL;
 	    }
+
 	  }
 	 $$ = resultado;
 
@@ -240,6 +226,7 @@ operacion_variable: VAR '+' VAR {
 		resultado->valor.v_entero = op->valor.v_entero + $3;
 		resultado->siguiente == NULL;
 	    }
+
 	  }
 	 $$ = resultado;
 

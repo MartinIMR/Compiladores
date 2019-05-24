@@ -75,22 +75,7 @@ cadena \"({nocs}*)\"
 
 
 {operadores}	{
-		 char op = yytext[0];
-	         /*
-		 switch(op)
-		 {
-		  case '+': printf("Suma\n"); break;
-		  case '-': printf("Resta\n"); break;
-		  case '*': printf("Multiplicacion\n"); break;
-		  case '/': printf("Division\n"); break;
-		  case '^': printf("Potencia\n"); break;
-		  case '(': printf("Parentesis derecho\n"); break;
-		  case ')': printf("Parentesis izquierdo\n"); break;
-		  case ';': printf("Punto y coma\n"); break;
-		  case ',': printf("Coma\n"); break;
-		 }
-		 */
-		 return op;
+		  return yytext[0];
                 }
 
 "\n" 		{ 

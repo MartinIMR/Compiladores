@@ -825,38 +825,23 @@ case 8:
 YY_RULE_SETUP
 #line 77 "pr.l"
 {
-		 char op = yytext[0];
-	         /*
-		 switch(op)
-		 {
-		  case '+': printf("Suma\n"); break;
-		  case '-': printf("Resta\n"); break;
-		  case '*': printf("Multiplicacion\n"); break;
-		  case '/': printf("Division\n"); break;
-		  case '^': printf("Potencia\n"); break;
-		  case '(': printf("Parentesis derecho\n"); break;
-		  case ')': printf("Parentesis izquierdo\n"); break;
-		  case ';': printf("Punto y coma\n"); break;
-		  case ',': printf("Coma\n"); break;
-		 }
-		 */
-		 return op;
+		  return yytext[0];
                 }
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 96 "pr.l"
+#line 81 "pr.l"
 { 
 		return '\n';
 		}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 102 "pr.l"
+#line 87 "pr.l"
 ECHO;
 	YY_BREAK
-#line 860 "pr.lex.c"
+#line 845 "pr.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1861,7 +1846,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 102 "pr.l"
+#line 87 "pr.l"
 
 
 char * 
