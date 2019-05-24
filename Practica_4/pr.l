@@ -75,7 +75,8 @@ cadena \"({nocs}*)\"
 
 
 {operadores}	{
-		  return yytext[0];
+		  yylval = yytext[0];
+		  return OP;
                 }
 
 "\n" 		{ 
