@@ -2,6 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+char *
+invertir_cadena(char * s)
+{
+  char * invertida = copiar_cadena(s);
+  int i = 0;
+  int longitud = longitud_cadena(s) - 1;
+  while(invertida[i] != '\0')
+  {
+    invertida[i] = s[longitud - i];
+  }
+  return invertida;
+}
+
 int
 comparar_cadenas(char * s1,char * s2)
 {

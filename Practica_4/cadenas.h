@@ -5,3 +5,4 @@ char * copiar_cadena(char *);
 char * potencia_cadena(char *,int );
 int comparar_cadenas(char *,char *);
 int longitud_cadena(char *);
+char * invertir_cadena(char *);
