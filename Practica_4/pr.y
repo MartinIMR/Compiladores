@@ -8,7 +8,6 @@ extern int yylex(void);
 int yyerror(char *); 
 struct simbolo * tabla = NULL;
 struct simbolo * operar_variables(struct simbolo *,struct simbolo *,int,int);
-
 %}
 
 %union {
@@ -160,6 +159,7 @@ operacion_variable: VAR '+' VAR {
 	  }
 	 $$ = resultado;
 	}
+/* Reglas para operacion entre variables y constantes */
 	| VAR '+' expresion_cadena {
 	  struct simbolo * resultado;
 	  struct simbolo * op = buscar_simbolo($1);
@@ -193,7 +193,7 @@ operacion_variable: VAR '+' VAR {
 	     resultado = NULL;
           }else
 	  {
-	    if( op->tipo != 1 )
+	    if( op->tipo == cadena )
 	    {
 		printf("Tipos no compatibles\n");
 		resultado = NULL;
@@ -298,9 +298,7 @@ operacion_variable: VAR '+' VAR {
 	    }
 	  }
 	 $$ = resultado;
-
 	}
-
 ;
 
 expresion_variable: VAR ';' 
@@ -323,7 +321,6 @@ expresion_variable: VAR ';'
 	    if(encontrado->tipo != 2)
 	    {
 	      printf("La asignacion no se puede realizar...\n");
-
 	    }else
 	    {
 		free(encontrado->valor.v_cadena);
@@ -338,13 +335,15 @@ expresion_variable: VAR ';'
 	    printf("Esa variable no esta declarada...\n");
 	  }else
 	  {
-	    if(encontrado->tipo != 0)
+	    if(encontrado->tipo == entero)
 	    {
-	      printf("La asignacion no se puede realizar...\n");
-
+	      encontrado->valor.v_entero = (int) $3;
+	    }else if(encontrado->tipo == real)
+	    {
+	      encontrado->valor.v_real = (double) $3;
 	    }else
 	    {
-		encontrado->valor.v_entero = $3;
+	     printf("La asignacion no se puede realizar...\n");
             }
 	  }
 	}
@@ -355,63 +354,100 @@ expresion_variable: VAR ';'
 	    printf("Esa variable no esta declarada...\n");
 	  }else
 	  {
-	    if(encontrado->tipo != 1)
+	    if(encontrado->tipo == entero)
 	    {
-	      printf("La asignacion no se puede realizar...\n");
+	      encontrado->valor.v_entero = (int) $3;
+	    }else if(encontrado->tipo == real)
+	    {
+	      encontrado->valor.v_real = (double) $3;
 	    }else
 	    {
-		encontrado->valor.v_real = $3;
-            }
+	     printf("La asignacion no se puede realizar...\n");
+	    }
 	  }
-
 	}
-	| ID VAR ';' { 
+	| ID VAR ';' {
+	 struct simbolo * nuevo = buscar_simbolo($2);
+	 if(nuevo == NULL)
+	 {
 	 struct simbolo * anterior = tabla;
 	 tabla = agregar_simbolo($2,$1);
-	 tabla->siguiente = anterior;
+	 tabla->siguiente = anterior; 
+         }else{
+	  printf("No se pudo hacer la declaracion, la variable ya existe...\n");
+	 }
 	}
 	| ID VAR '=' expresion_cadena ';' { 
+
+	 struct simbolo * nuevo = buscar_simbolo($2);
+	 if(nuevo == NULL)
+	 {
 	 struct simbolo * anterior = tabla;
 	 tabla = agregar_simbolo($2,$1);
 	 tabla -> siguiente = anterior;
-	 if(tabla->tipo != 2)
-	 {
+	  if(tabla->tipo != 2)
+	  {
 	   printf("Asignacion no compatible, variable no declarada...\n");
 	   free(tabla);
 	   tabla = anterior;
+	  }else
+	  {
+	   tabla->valor.v_cadena = $4;
+	  }
 	 }else
 	 {
-	   tabla->valor.v_cadena = $4;
-	 }
+	   printf("No se pudo hacer la declaracion, la variable ya existe...\n");
+ 	 }
 
 	}
 	| ID VAR '=' expresion_entero ';' { 
-	 struct simbolo * anterior = tabla;
-	 tabla = agregar_simbolo($2,$1);
-	 tabla -> siguiente = anterior;
-	 if(tabla->tipo != 0)
+	 struct simbolo * nuevo = buscar_simbolo($2);
+	 if(nuevo == NULL)
 	 {
+	  struct simbolo * anterior = tabla;
+	  tabla = agregar_simbolo($2,$1);
+	  tabla -> siguiente = anterior;
+	  if(tabla->tipo == entero)
+	  {
+	   tabla->valor.v_entero = $4;
+	  }else if(tabla->tipo == real)
+	  {
+	   tabla->valor.v_real = (double) $4;
+	  }else{
 	   printf("Asignacion no compatible, variable no declarada...\n");
 	   free(tabla);
 	   tabla = anterior;
+	  }
+	
 	 }else
 	 {
-	   tabla->valor.v_entero = $4;
+		printf("No se pudo hacer la declaracion, la variable ya existe...\n");
 	 }
+	 
 	}
 	| ID VAR '=' expresion_real ';' { 
+	 struct simbolo * nuevo = buscar_simbolo($2);
+	 if(nuevo == NULL)
+	 {
 	 struct simbolo * anterior = tabla;
 	 tabla = agregar_simbolo($2,$1);
 	 tabla -> siguiente = anterior;
-	 if(tabla->tipo != 1)
+	 if(tabla->tipo == real)
 	 {
+	   tabla->valor.v_real = $4;
+	 }else if(tabla->tipo == entero)
+	 {
+	   tabla->valor.v_entero = (int) $4;
+	 }else{
 	   printf("Asignacion no compatible, variable no declarada...\n");
 	   free(tabla);
 	   tabla = anterior;
-	 }else
-	 {
-	   tabla->valor.v_real = $4;
 	 }
+
+	 }else{
+		printf("No se pudo hacer la declaracion, la variable ya existe...\n");
+	 }
+
 	}
 	| VAR '=' operacion_variable ';' {
 
@@ -450,10 +486,14 @@ expresion_variable: VAR ';'
 	  free($1);
 	}
 	| ID VAR '=' operacion_variable ';' {
+	 struct simbolo * nuevo = buscar_simbolo($2);
+	 if(nuevo == NULL)
+	 {
 	 struct simbolo * anterior = tabla;
 	 tabla = agregar_simbolo($2,$1);
 	 tabla -> siguiente = anterior;
 	 struct simbolo * resultado = $4;
+	 /* Falta agregar asignacion entero y real */
 	 if(tabla->tipo != resultado->tipo)
 	 {
 	   printf("Asignacion no compatible, variable no declarada...\n");
@@ -478,6 +518,12 @@ expresion_variable: VAR ';'
 		free(resultado);
 	 }
 
+	
+	 }else{
+	  printf("No se pudo hacer la declaracion, la variable ya está declarada...\n");
+	 }
+
+	 
 	}
 ;
 
