@@ -84,7 +84,10 @@ linea: '\n'
 
 ;
 
-operacion_variable: VAR '+' VAR {
+operacion_variable: '(' operacion_variable ')'{
+		$$ = $2; 
+	 }
+	 | VAR '+' VAR {
 	  struct simbolo * resultado;
 	  struct simbolo * op1 = buscar_simbolo($1);
 	  struct simbolo * op2 = buscar_simbolo($3);
@@ -159,6 +162,8 @@ operacion_variable: VAR '+' VAR {
 	  }
 	 $$ = resultado;
 	}
+
+
 /* Reglas para operacion entre variables y constantes */
 
 /* SUMA */
@@ -825,9 +830,174 @@ operacion_variable: VAR '+' VAR {
 	  }
 	 $$ = resultado;
 	}
+/* POTENCIA */
+/* Operacion variable y cadenas */ 
+	| VAR '^' expresion_cadena {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($1);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+	    if( op->tipo != 2 )
+	    {
+		printf("Tipos no compatibles\n");
+		resultado = NULL;
+	    }else
+	    {
+		/*
+		resultado = agregar_simbolo("Resultado",cadena);
+		resultado->valor.v_cadena = dividir_cadenas(op->valor.v_cadena,$3);
+		resultado->siguiente == NULL;
+		*/
+		printf("La operacion potencia entre cadenas no esta definida...\n");
+		resultado = NULL;
+	    }
+	  }
+	 $$ = resultado;
+	}
+	| expresion_cadena '^' VAR {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($3);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+	    if( op->tipo != entero )
+	    {
+		printf("La potencia no puede ser llevada a cabo\n");
+		resultado = NULL;
+	    }else
+	    {
+		resultado = agregar_simbolo("Resultado",cadena);
+		int potencia = op->valor.v_entero;
+		if(potencia == 0)
+		{
+		 resultado->valor.v_cadena = copiar_cadena("Epsilon");
+		}else if(potencia < 0)
+		{
+		 resultado->valor.v_cadena = potencia_cadena(invertir_cadena($1),(-potencia));
+		 
+		}else{
+		 resultado->valor.v_cadena = potencia_cadena($1,potencia);
+		}
+		resultado->siguiente == NULL;
+	    }
+	  }
+	 free($1);
+	 $$ = resultado;
+	}
+	| POW'('VAR','expresion_entero')' {
+	  struct simbolo * resultado;
+	  struct simbolo * op = buscar_simbolo($3);
+	  if( op == NULL)
+	  {
+	     printf("La variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else
+	  {	
+		if(op->tipo == cadena)
+		{
+		resultado = agregar_simbolo("Resultado",cadena);
+		int potencia = $5;
+		if(potencia == 0)
+		{
+		 resultado->valor.v_cadena = copiar_cadena("Epsilon");
+		}else if(potencia < 0)
+		{
+		 resultado->valor.v_cadena = potencia_cadena(invertir_cadena(op->valor.v_cadena),(-potencia));
+		}else{
+		 resultado->valor.v_cadena = potencia_cadena(op->valor.v_cadena,potencia);
+		}
+		resultado->siguiente == NULL;
+		}else{
+		printf("En desarrollo..\n");
+		resultado = NULL;
+		}
+	  }
+	 $$ = resultado;
+	}
+	| POW'('VAR','VAR')' {
+	  struct simbolo * resultado;
+	  struct simbolo * op1 = buscar_simbolo($3);
+	  struct simbolo * op2 = buscar_simbolo($5);
+	  if( op1 == NULL || op2 == NULL )
+	  {
+	     printf("Alguna variable no ha sido declarada...\n");
+	     resultado = NULL;
+          }else 
+	  {	
+		if(op1->tipo == cadena)
+		{
+		
+		resultado = agregar_simbolo("Resultado",cadena);
+		int potencia = 0;
+		  if(op2->tipo == cadena)
+		  {
+			printf("No se puede realizar ese operacion...\n");
+			resultado = NULL;
+		  }else
+		  {
+		   	if(op2->tipo == entero)
+		   	{
+		    	potencia = op2->valor.v_entero;
+		   	}else if(op2->tipo == real){
+		    	potencia = (int) op2->valor.v_real;
+		   	}
+		if(potencia == 0)
+		{
+		 resultado->valor.v_cadena = copiar_cadena("Epsilon");
+		}else if(potencia < 0)
+		{
+		 resultado->valor.v_cadena = potencia_cadena(invertir_cadena(op1->valor.v_cadena),(-potencia));
+		}else{
+		 resultado->valor.v_cadena = potencia_cadena(op1->valor.v_cadena,potencia);
+		}
+		resultado->siguiente == NULL;
+
+		  }
+		}else
+		{
+		  printf("En desarrollo..\n");
+		  resultado = NULL;
+		}
+	  }
+	 $$ = resultado;
+	}
+
 ;
 
-expresion_variable: VAR ';' 
+expresion_variable: VAR {
+	  struct simbolo * encontrado = buscar_simbolo($1);
+	  if(encontrado == NULL)
+	  {
+	    printf("La variable no se encuentra declarada...\n");
+	  }
+	  $$ = encontrado;
+        }
+	| '(' VAR ')'
+	{
+	  struct simbolo * encontrado = buscar_simbolo($2);
+	  if(encontrado == NULL)
+	  {
+	    printf("La variable no se encuentra declarada...\n");
+	  }
+	  $$ = encontrado;
+
+	}
+	| '(' operacion_variable ')'{
+	  struct simbolo * recibida = $2;
+	  if(recibida == NULL)
+	  {
+	    printf("La operacion no es valida...\n");
+	  }
+	  $$ = recibida;
+	}
+	| VAR ';' 
 	{
 	  struct simbolo * encontrado = buscar_simbolo($1);
 	  if(encontrado == NULL)
@@ -1077,7 +1247,17 @@ expresion_cadena: CADENA { $$ = $1;}
 	 }
 	| expresion_cadena '^' expresion_entero 
 	{ 
-          $$ = potencia_cadena($1,$3); 
+	  int potencia = $3;
+	  if(potencia ==  0)
+	  {
+		$$ = "";
+	  }else if(potencia < 0)
+	  {
+		$$ = potencia_cadena(invertir_cadena($1),(-potencia));	
+	  }else{
+		$$ = potencia_cadena($1,potencia);
+	  }
+
 	}
 	| '+'expresion_cadena {$$ = $2;}
 	| '-''-' expresion_cadena{ $$ = $3;}
@@ -1094,6 +1274,123 @@ expresion_cadena: CADENA { $$ = $1;}
 		$$ = potencia_cadena($3,potencia);
 	  }
 	}
+	| SI '('expresion_variable'<'expresion_variable')'';'{
+		struct simbolo * op1 = $3;
+		struct simbolo * op2 = $5;
+		char * resultado;
+	if(op1 == NULL || op2 == NULL)
+	{
+		printf("Alguna de las variables es nula\nNo se puede realizar la comparacion...\n");
+		resultado = copiar_cadena("Error");
+	}else
+	{
+		int t1 = op1->tipo,t2 = op2->tipo;
+		int l1,l2;
+		if(t1 == t2)
+		{
+		   switch(t1)
+		   {
+			case entero:
+			l1 = op1->valor.v_entero;
+			l2 = op2->valor.v_entero;
+			break;
+			case real:
+			l1 = (int)op1->valor.v_real;
+			l2 = (int)op2->valor.v_real;
+			break;
+			case cadena:
+			l1 = longitud_cadena(op1->valor.v_cadena); 
+			l2 = longitud_cadena(op2->valor.v_cadena);
+			break;
+		   }
+		}else if( t1 == entero && t2 == real){
+		  l1 = op1->valor.v_entero;  
+		  l2 = (int) op2->valor.v_real;
+		}else if( t1 == real && t2 == entero){
+		  l1 = (int)op1->valor.v_real; 
+		  l2 = op2->valor.v_entero;
+		}else if( t1 == cadena && t2 == real){
+		  l1 = longitud_cadena(op1->valor.v_cadena);  
+		  l2 = (int) op2->valor.v_real;
+		}else if( t1 == real && t2 == cadena){
+		  l1 = (int) op1->valor.v_real;
+		  l2 = longitud_cadena(op2->valor.v_cadena);  
+		}else if( t1 == cadena && t2 == entero){
+		  l1 = longitud_cadena(op1->valor.v_cadena);  
+		  l2 =  op2->valor.v_entero;
+		}else if( t1 == entero && t2 == cadena){
+		  l1 = (int) op1->valor.v_entero;
+		  l2 = longitud_cadena(op2->valor.v_cadena);  
+		}
+		if(l1 < l2)
+		{
+		resultado = copiar_cadena("true");
+		}else{
+		resultado = copiar_cadena("false");
+		}
+	}
+	     $$ = resultado;
+	}
+	| SI '('expresion_variable'>'expresion_variable')'';'{
+		struct simbolo * op1 = $3;
+		struct simbolo * op2 = $5;
+		char * resultado;
+	if(op1 == NULL || op2 == NULL)
+	{
+		printf("Alguna de las variables es nula\nNo se puede realizar la comparacion...\n");
+		resultado = copiar_cadena("Error");
+	}else
+	{
+		int t1 = op1->tipo,t2 = op2->tipo;
+		int l1,l2;
+		if(t1 == t2)
+		{
+		   switch(t1)
+		   {
+			case entero:
+			l1 = op1->valor.v_entero;
+			l2 = op2->valor.v_entero;
+			break;
+			case real:
+			l1 = (int)op1->valor.v_real;
+			l2 = (int)op2->valor.v_real;
+			break;
+			case cadena:
+			l1 = longitud_cadena(op1->valor.v_cadena); 
+			l2 = longitud_cadena(op2->valor.v_cadena);
+			break;
+		   }
+		}else if( t1 == entero && t2 == real){
+		  l1 = op1->valor.v_entero;  
+		  l2 = (int) op2->valor.v_real;
+		}else if( t1 == real && t2 == entero){
+		  l1 = (int)op1->valor.v_real; 
+		  l2 = op2->valor.v_entero;
+		}else if( t1 == cadena && t2 == real){
+		  l1 = longitud_cadena(op1->valor.v_cadena);  
+		  l2 = (int) op2->valor.v_real;
+		}else if( t1 == real && t2 == cadena){
+		  l1 = (int) op1->valor.v_real;
+		  l2 = longitud_cadena(op2->valor.v_cadena);  
+		}else if( t1 == cadena && t2 == entero){
+		  l1 = longitud_cadena(op1->valor.v_cadena);  
+		  l2 =  op2->valor.v_entero;
+		}else if( t1 == entero && t2 == cadena){
+		  l1 = (int) op1->valor.v_entero;
+		  l2 = longitud_cadena(op2->valor.v_cadena);  
+		}
+		if(l1 > l2)
+		{
+		resultado = copiar_cadena("true");
+		}else{
+		resultado = copiar_cadena("false");
+		}
+	}
+	     $$ = resultado;
+	}
+
+
+
 	| SI'('expresion_entero'<'expresion_real')'';' {
 	 char * resultado;
 	 if($3 < $5){ 

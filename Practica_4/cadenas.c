@@ -11,6 +11,7 @@ invertir_cadena(char * s)
   while(invertida[i] != '\0')
   {
     invertida[i] = s[longitud - i];
+    i++;
   }
   return invertida;
 }
